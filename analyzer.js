@@ -264,6 +264,14 @@
                 var problemId;
                 for(key in result){
                     if(result[key].verdict==="OK"){
+                        contestId=result[key].problem.contestId;
+                        problemIndex=result[key].problem.index;
+                        problemId=contestId+problemIndex;
+                        if(problemId in solved){
+                            continue;
+                        } else{
+                          solved[problemId]={contestId:contestId,problemIndex:problemIndex};
+                        }
                         var rating=result[key].problem.rating;
                         var tags=result[key].problem.tags;
                         var lang=result[key].programmingLanguage;
@@ -286,13 +294,6 @@
                           res.lang[lang]++;
                         }else{
                           res.lang[lang]=1;
-                        }
-                        contestId=result[key].problem.contestId;
-                        problemIndex=result[key].problem.index;
-                        problemId=contestId+problemIndex;
-                        if(problemId in solved){}
-                        else{
-                          solved[problemId]={contestId:contestId,problemIndex:problemIndex};
                         }
                     }
                 }
