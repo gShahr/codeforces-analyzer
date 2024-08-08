@@ -29,6 +29,15 @@
         document.getElementById('pageContent').insertAdjacentHTML('beforeend',div);
         var chartDom = document.getElementById('ratingChart');
         var myChart = echarts.init(chartDom);
+
+        var inputBox = '<input type="text" id="chartInput" placeholder="Type and press Enter" style="margin-bottom: 1em; width: 100%; padding: 0.5em;">';
+        chartDom.insertAdjacentHTML('afterbegin', inputBox);
+        document.getElementById('chartInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                handleInput(event.target.value);
+            }
+        });
+
         var option;
         var key;
         window.addEventListener('resize', function() {
@@ -80,12 +89,14 @@
                 }
               ]
         };
-  
         option && myChart.setOption(option);
-  
     }
-    function drawTagsChart(res){
-  
+
+    function handleInput(value) {
+      console.log('User input:', value);
+    }
+
+  function drawTagsChart(res){
       var div='<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="tagsChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;"></div>';
       document.getElementById('pageContent').insertAdjacentHTML('beforeend',div);
       var chartDom = document.getElementById('tagsChart');
