@@ -25,10 +25,17 @@
     }
   
     function drawRatingChart(res){
-        var div='<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="ratingChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;"></div>';
-        document.getElementById('pageContent').insertAdjacentHTML('beforeend',div);
+        var div = '<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="ratingChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;position:relative;"></div>';
+        document.getElementById('pageContent').insertAdjacentHTML('beforeend', div);
         var chartDom = document.getElementById('ratingChart');
         var myChart = echarts.init(chartDom);
+        var inputBox = '<input type="text" id="chartInput" placeholder="Type and press Enter" style="position:absolute; top:0; left:0; width:100%; padding:0.5em; z-index:10;">';
+        chartDom.insertAdjacentHTML('afterbegin', inputBox);
+        document.getElementById('chartInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                handleInput(event.target.value, myChart);
+            }
+        });
         var option;
         var key;
         window.addEventListener('resize', function() {
@@ -75,17 +82,124 @@
                 {
                   name: 'solved',
                   type: 'bar',
-                  barWidth: '60%',
+                  barWidth: '30%',
                   data: yData
                 }
               ]
         };
-  
         option && myChart.setOption(option);
-  
     }
-    function drawTagsChart(res){
+
+    function testing(handle, callback, errorCallback) {
+      let httpRequest = new XMLHttpRequest();
+      var res={rating:{},tags:{},lang:{},unsolved:{}};
+      httpRequest.onreadystatechange = function () {
+            if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+              var json=JSON.parse(httpRequest.responseText);
+              var result=json.result;
+              var solved={};
+              var key;
+              var contestId;
+              var problemIndex;
+              var problemId;
+              for(key in result){
+                  if(result[key].verdict==="OK"){
+                      contestId=result[key].problem.contestId;
+                      problemIndex=result[key].problem.index;
+                      problemId=contestId+problemIndex;
+                      if(problemId in solved){
+                          continue;
+                      } else{
+                        solved[problemId]={contestId:contestId,problemIndex:problemIndex};
+                      }
+                      var rating=result[key].problem.rating;
+                      var tags=result[key].problem.tags;
+                      var lang=result[key].programmingLanguage;
+                      if(rating in res.rating){
+                          res.rating[rating]++;
+                      }
+                      else{
+                          res.rating[rating]=1;
+                      }
+                      for(var key2 in tags){
+                        var tag=tags[key2];
+                        if(tag in res.tags){
+                          res.tags[tag]++;
+                        }
+                        else{
+                          res.tags[tag]=1;
+                        }
+                      }
+                      if(lang in res.lang){
+                        res.lang[lang]++;
+                      }else{
+                        res.lang[lang]=1;
+                      }
+                  }
+              }
+              for(key in result){
+                if(result[key].verdict!=="OK"){
+                  contestId=result[key].problem.contestId;
+                  problemIndex=result[key].problem.index;
+                  problemId=contestId+problemIndex;
+                  if(problemId in solved){}
+                  else{
+                    res.unsolved[problemId]={contestId:contestId,problemIndex:problemIndex};
+                  }
+                }
+              }
+                  callback(res);
+              } else {
+                  errorCallback(`Error: ${httpRequest.status} - ${httpRequest.statusText}`);
+              }
+          }
   
+      httpRequest.onerror = function () {
+          errorCallback('Network Error');
+      };
+  
+      httpRequest.ontimeout = function () {
+          errorCallback('Request Timed Out');
+      };
+  
+      httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle=' + handle, true);
+      httpRequest.timeout = 5000; // Set timeout to 5 seconds
+      httpRequest.send();
+  }
+
+    function handleInput(value, chart) {
+      console.log('User input:', value);
+      testing(value, function (processedData) {
+          updateChart(chart, processedData);
+          console.log(processedData);
+      }, function (error) {
+          console.error(error);
+      });
+    }
+
+    function updateChart(chart, res) {
+      var key;
+      var xData=[];
+      var yData=[];
+      xData=Object.keys(res.rating);
+      for(key in xData){
+          yData.push(res.rating[xData[key]]);
+      }
+      var option = chart.getOption();
+      var newSeries = {
+        name: 'solved',
+        type: 'bar',
+        barWidth: '30%',
+        itemStyle: {
+          color: '#ff0000'
+        },
+        data: yData
+      };
+      option.series.push(newSeries);
+      chart.setOption(option);
+    }
+
+  function drawTagsChart(res){
       var div='<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="tagsChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;"></div>';
       document.getElementById('pageContent').insertAdjacentHTML('beforeend',div);
       var chartDom = document.getElementById('tagsChart');
@@ -246,70 +360,77 @@
       }
       document.getElementById('unsolvedChart').insertAdjacentHTML('beforeend',toAdd1+total+toAdd2);
     }
-  
-    var pathname = window.location.pathname;
-    var handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
-    var httpRequest = new XMLHttpRequest();
-        httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle='+handle, true);
-        httpRequest.send();
-        httpRequest.onreadystatechange = function () {
-            if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-                var json=JSON.parse(httpRequest.responseText);
-                var result=json.result;
-                var res={rating:{},tags:{},lang:{},unsolved:{}};
-                var solved={};
-                var key;
-                var contestId;
-                var problemIndex;
-                var problemId;
-                for(key in result){
-                    if(result[key].verdict==="OK"){
-                        contestId=result[key].problem.contestId;
-                        problemIndex=result[key].problem.index;
-                        problemId=contestId+problemIndex;
-                        if(problemId in solved){
-                            continue;
-                        } else{
-                          solved[problemId]={contestId:contestId,problemIndex:problemIndex};
-                        }
-                        var rating=result[key].problem.rating;
-                        var tags=result[key].problem.tags;
-                        var lang=result[key].programmingLanguage;
-                        if(rating in res.rating){
-                            res.rating[rating]++;
-                        }
-                        else{
-                            res.rating[rating]=1;
-                        }
-                        for(var key2 in tags){
-                          var tag=tags[key2];
-                          if(tag in res.tags){
-                            res.tags[tag]++;
-                          }
-                          else{
-                            res.tags[tag]=1;
-                          }
-                        }
-                        if(lang in res.lang){
-                          res.lang[lang]++;
-                        }else{
-                          res.lang[lang]=1;
-                        }
-                    }
-                }
-                for(key in result){
-                  if(result[key].verdict!=="OK"){
+
+    function getData(handle) {
+      var httpRequest = new XMLHttpRequest();
+      httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle='+handle, true);
+      httpRequest.send();
+      var res={rating:{},tags:{},lang:{},unsolved:{}};
+      httpRequest.onreadystatechange = function () {
+          if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+            var json=JSON.parse(httpRequest.responseText);
+            var result=json.result;
+            var solved={};
+            var key;
+            var contestId;
+            var problemIndex;
+            var problemId;
+            for(key in result){
+                if(result[key].verdict==="OK"){
                     contestId=result[key].problem.contestId;
                     problemIndex=result[key].problem.index;
                     problemId=contestId+problemIndex;
-                    if(problemId in solved){}
-                    else{
-                      res.unsolved[problemId]={contestId:contestId,problemIndex:problemIndex};
+                    if(problemId in solved){
+                        continue;
+                    } else{
+                      solved[problemId]={contestId:contestId,problemIndex:problemIndex};
                     }
-                  }
+                    var rating=result[key].problem.rating;
+                    var tags=result[key].problem.tags;
+                    var lang=result[key].programmingLanguage;
+                    if(rating in res.rating){
+                        res.rating[rating]++;
+                    }
+                    else{
+                        res.rating[rating]=1;
+                    }
+                    for(var key2 in tags){
+                      var tag=tags[key2];
+                      if(tag in res.tags){
+                        res.tags[tag]++;
+                      }
+                      else{
+                        res.tags[tag]=1;
+                      }
+                    }
+                    if(lang in res.lang){
+                      res.lang[lang]++;
+                    }else{
+                      res.lang[lang]=1;
+                    }
                 }
-                console.log(res);
-                drawChart(res);
             }
-        };
-  })();
+            for(key in result){
+              if(result[key].verdict!=="OK"){
+                contestId=result[key].problem.contestId;
+                problemIndex=result[key].problem.index;
+                problemId=contestId+problemIndex;
+                if(problemId in solved){}
+                else{
+                  res.unsolved[problemId]={contestId:contestId,problemIndex:problemIndex};
+                }
+              }
+            }
+            drawChart(res);
+          }
+        }
+    }
+
+    function draw() {
+        let pathname = window.location.pathname;
+        let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
+        getData(handle);
+    }
+
+    draw();  
+})();
