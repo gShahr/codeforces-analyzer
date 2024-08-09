@@ -26,7 +26,7 @@ The Codeforces Analyzer is designed to provide insights into your problem-solvin
 ## New Features
 
 - Only counts solved problems once (Old extension was counting unique solutions multiple times).
-- Add comparison ability for problem rating chart
+- Comparison ability for problem rating chart
 
 ## Installation
 
