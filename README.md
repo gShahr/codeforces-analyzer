@@ -6,6 +6,7 @@ This project is a tool for visualizing Codeforces problem-solving data. It helps
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [New Features](#new-features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -22,19 +23,29 @@ The Codeforces Analyzer is designed to provide insights into your problem-solvin
 - Identify unsolved problems and track your progress over time.
 - Interactive charts for easy data interpretation.
 
+## New Features
+
+- Only counts solved problems once (Old extension was counting unique solutions multiple times).
+- Add comparison ability for problem rating chart
+
 ## Installation
 
 To install the Codeforces Analyzer, follow these steps:
 
 1. Clone the repository:
+
     ```sh
     git clone https://github.com/yourusername/codeforces-analyzer.git
     ```
+
 2. Navigate to the project directory:
+
     ```sh
     cd codeforces-analyzer
     ```
+
 3. Install the required dependencies:
+
     ```sh
     npm install
     ```
@@ -44,9 +55,11 @@ To install the Codeforces Analyzer, follow these steps:
 To use the Codeforces Analyzer, follow these steps:
 
 1. Run the application:
+
     ```sh
     npm start
     ```
+
 2. Open your browser and navigate to `http://localhost:3000`.
 3. Enter your Codeforces handle to start analyzing your data.
 
@@ -56,17 +69,23 @@ We welcome contributions to improve the Codeforces Analyzer. To contribute, plea
 
 1. Fork the repository.
 2. Create a new branch:
+
     ```sh
     git checkout -b feature/your-feature-name
     ```
+
 3. Make your changes and commit them:
+
     ```sh
     git commit -m 'Add some feature'
     ```
+
 4. Push to the branch:
+
     ```sh
     git push origin feature/your-feature-name
     ```
+
 5. Open a pull request.
 
 ## License
