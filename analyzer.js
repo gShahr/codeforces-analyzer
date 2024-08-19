@@ -19,6 +19,7 @@
     'use strict';
     function drawChart(res){
       drawRatingChart(res);
+      drawContestChart(res);
       drawTagsChart(res);
       drawLangChart(res);
       drawUnsolvedChart(res);
@@ -198,6 +199,11 @@
       option.series.push(newSeries);
       chart.setOption(option);
     }
+
+    
+  function drawContestChart(res) {
+    
+  }
 
   function drawTagsChart(res){
       var div='<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="tagsChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;"></div>';
@@ -425,6 +431,68 @@
           }
         }
     }
+
+    function getContestData(handle) {
+      var httpRequest = new XMLHttpRequest();
+      httpRequest.open('GET', 'https://codeforces.com/api/user.rating?handle='+handle, true);
+      httpRequest.send();
+      httpRequest.onreadystatechange = function () {
+          if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+            var res = getcontestStat(JSON.parse(httpRequest.responseText));
+            console.log(res);
+            //drawChart(res);
+          }
+        }
+    }
+
+    function getContestStat(data) {
+      var ret = {};
+      ret.best = 1e10;
+      ret.worst = -1e10;
+      ret.maxUp = 0;
+      ret.maxDown = 0;
+      ret.bestCon = '';
+      ret.worstCon = '';
+      ret.maxUpCon = '';
+      ret.maxDownCon = '';
+      ret.maxRating = 0;
+      ret.minRating = 1e10;
+      ret.rating = 0;
+      ret.tot = data.result.length;
+      ret.timeline = [];
+      ret.all = {};
+    
+      for (var i = 0; i < data.result.length; i++) {
+        var con = data.result[i];
+        ret.all[con.contestId] = [con.contestName, con.rank];
+        if (con.rank < ret.best) {
+          ret.best = con.rank;
+          ret.bestCon = con.contestId;
+        }
+        if (con.rank > ret.worst) {
+          ret.worst = con.rank;
+          ret.worstCon = con.contestId;
+        }
+        var ch = con.newRating - con.oldRating;
+        if (ch > ret.maxUp) {
+          ret.maxUp = ch;
+          ret.maxUpCon = con.contestId;
+        }
+        if (ch < ret.maxDown) {
+          ret.maxDown = ch;
+          ret.maxDownCon = con.contestId;
+        }
+    
+        ret.maxRating = Math.max(ret.maxRating, con.newRating);
+        ret.minRating = Math.min(ret.minRating, con.newRating);
+    
+        if (i == data.result.length - 1) ret.rating = con.newRating;
+    
+        ret.timeline.push([con.ratingUpdateTimeSeconds, con.newRating]);
+      }
+    
+      return ret;
+    }    
 
     function draw() {
         let pathname = window.location.pathname;
