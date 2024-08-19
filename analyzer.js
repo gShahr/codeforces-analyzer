@@ -19,10 +19,28 @@
     'use strict';
     function drawChart(res){
       drawRatingChart(res);
-      drawContestChart(res);
       drawTagsChart(res);
       drawLangChart(res);
       drawUnsolvedChart(res);
+    }
+
+    function drawContestChart(ret) {
+      var container = document.createElement('div');
+      container.className = 'info-box';
+      container.innerHTML = `
+          <div class="info-item">Best: ${ret.best}</div>
+          <div class="info-item">Worst: ${ret.worst}</div>
+          <div class="info-item">Max Up: ${ret.maxUp}</div>
+          <div class="info-item">Max Down: ${ret.maxDown}</div>
+          <div class="info-item">Best Contest: ${ret.bestCon}</div>
+          <div class="info-item">Worst Contest: ${ret.worstCon}</div>
+          <div class="info-item">Max Up Contest: ${ret.maxUpCon}</div>
+          <div class="info-item">Max Down Contest: ${ret.maxDownCon}</div>
+          <div class="info-item">Max Rating: ${ret.maxRating}</div>
+          <div class="info-item">Min Rating: ${ret.minRating}</div>
+          <div class="info-item">Rating: ${ret.rating}</div>
+      `;
+      document.body.appendChild(container);
     }
   
     function drawRatingChart(res){
@@ -199,11 +217,6 @@
       option.series.push(newSeries);
       chart.setOption(option);
     }
-
-    
-  function drawContestChart(res) {
-    
-  }
 
   function drawTagsChart(res){
       var div='<div class="roundbox userActivityRoundBox borderTopRound borderBottomRound" id="tagsChart" style="height:400px;padding:2em 1em 0 1em;margin-top:1em;"></div>';
@@ -432,16 +445,22 @@
         }
     }
 
-    function getContestData(handle) {
-      let httpRequest = new XMLHttpRequest();
-      httpRequest.open('GET', 'https://codeforces.com/api/user.rating?handle='+handle, true);
-      httpRequest.send();
-      httpRequest.onreadystatechange = function () {
-          if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-            let res = getContestStat(JSON.parse(httpRequest.responseText));
-            return res;
-          }
-        }
+    async function getContestData(handle) {
+      return new Promise((resolve, reject) => {
+          let httpRequest = new XMLHttpRequest();
+          httpRequest.open('GET', 'https://codeforces.com/api/user.rating?handle=' + handle, true);
+          httpRequest.send();
+          httpRequest.onreadystatechange = function () {
+              if (httpRequest.readyState == 4) {
+                  if (httpRequest.status == 200) {
+                      let res = getContestStat(JSON.parse(httpRequest.responseText));
+                      resolve(res);
+                  } else {
+                      reject(new Error('Request failed with status ' + httpRequest.status));
+                  }
+              }
+          };
+      });
     }
 
     function getContestStat(data) {
@@ -495,9 +514,25 @@
     function draw() {
         let pathname = window.location.pathname;
         let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
+        // let contestData = getContestData(handle);
+        // console.log(contestData);
+        // drawContestChart(contestData);
         getData(handle);
-        let contestData = getContestData(handle);
     }
 
-    draw();  
+    async function fetchContestData(handle) {
+      try {
+          return await getContestData(handle);
+      } catch (error) {
+          console.error('Error fetching contest data:', error);
+      }
+    }
+    async function drawContestChartWithData(handle) {
+      const data = await fetchContestData(handle);
+      drawContestChart(data);
+    }
+
+    drawContestChartWithData('gshahrouzi');
+
+    // draw();  
 })();
