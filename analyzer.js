@@ -368,10 +368,10 @@
     }
 
     function getData(handle) {
-      var httpRequest = new XMLHttpRequest();
+      let httpRequest = new XMLHttpRequest();
       httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle='+handle, true);
       httpRequest.send();
-      var res={rating:{},tags:{},lang:{},unsolved:{}};
+      let res={rating:{},tags:{},lang:{},unsolved:{}};
       httpRequest.onreadystatechange = function () {
           if (httpRequest.readyState == 4 && httpRequest.status == 200) {
             var json=JSON.parse(httpRequest.responseText);
@@ -433,20 +433,19 @@
     }
 
     function getContestData(handle) {
-      var httpRequest = new XMLHttpRequest();
+      let httpRequest = new XMLHttpRequest();
       httpRequest.open('GET', 'https://codeforces.com/api/user.rating?handle='+handle, true);
       httpRequest.send();
       httpRequest.onreadystatechange = function () {
           if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-            var res = getcontestStat(JSON.parse(httpRequest.responseText));
-            console.log(res);
-            //drawChart(res);
+            let res = getContestStat(JSON.parse(httpRequest.responseText));
+            return res;
           }
         }
     }
 
     function getContestStat(data) {
-      var ret = {};
+      let ret = {};
       ret.best = 1e10;
       ret.worst = -1e10;
       ret.maxUp = 0;
@@ -490,7 +489,6 @@
     
         ret.timeline.push([con.ratingUpdateTimeSeconds, con.newRating]);
       }
-    
       return ret;
     }    
 
@@ -498,6 +496,7 @@
         let pathname = window.location.pathname;
         let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
         getData(handle);
+        let contestData = getContestData(handle);
     }
 
     draw();  
