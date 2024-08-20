@@ -1,11 +1,9 @@
 // ==UserScript==
-// @name         CF解题数据可视化
-// @name:en      codeforces analytics
-// @namespace    https://codeforces.com/profile/tongwentao
-// @version      1.5.1
-// @description  显示某人Codeforces每个难度过了多少题，每个标签占比，喜欢用什么语言过题，有什么题试过了但是没有通过。
-// @description:en Analyse Codeforces profiles
-// @author       tongwentao
+// @name         Codeforces Analyzer
+// @namespace    https://codeforces.com/profile/gshahrouzi
+// @version      2.0
+// @description  The Codeforces Analyzer is designed to provide insights into your problem-solving patterns on Codeforces
+// @author       gShahr
 // @match        https://codeforces.com/profile/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
