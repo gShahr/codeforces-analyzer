@@ -40,7 +40,7 @@
           <div class="info-item">Min Rating: ${ret.minRating}</div>
           <div class="info-item">Rating: ${ret.rating}</div>
       `;
-      document.body.appendChild(container);
+      document.getElementById('pageContent').appendChild(container);
     }
   
     function drawRatingChart(res){
@@ -514,9 +514,6 @@
     function draw() {
         let pathname = window.location.pathname;
         let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
-        // let contestData = getContestData(handle);
-        // console.log(contestData);
-        // drawContestChart(contestData);
         getData(handle);
     }
 
@@ -533,6 +530,5 @@
     }
 
     drawContestChartWithData('gshahrouzi');
-
-    // draw();  
+    draw();  
 })();
