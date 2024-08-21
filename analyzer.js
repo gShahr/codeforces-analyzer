@@ -507,12 +507,6 @@
         ret.timeline.push([con.ratingUpdateTimeSeconds, con.newRating]);
       }
       return ret;
-    }    
-
-    function draw() {
-        let pathname = window.location.pathname;
-        let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
-        getData(handle);
     }
 
     async function fetchContestData(handle) {
@@ -522,13 +516,18 @@
           console.error('Error fetching contest data:', error);
       }
     }
+
     async function drawContestChartWithData(handle) {
       const data = await fetchContestData(handle);
       drawContestChart(data);
     }
 
-    let pathname = window.location.pathname;
-    let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
-    drawContestChartWithData(handle);
+    function draw() {
+        let pathname = window.location.pathname;
+        let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
+        drawContestChartWithData(handle);
+        getData(handle);
+    }
+
     draw();  
 })();
