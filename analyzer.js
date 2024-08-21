@@ -527,6 +527,8 @@
       drawContestChart(data);
     }
 
-    drawContestChartWithData('gshahrouzi');
+    let pathname = window.location.pathname;
+    let handle = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
+    drawContestChartWithData(handle);
     draw();  
 })();
