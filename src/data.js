@@ -1,65 +1,69 @@
-function getData(handle) {
-    let httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle=' + handle, true);
-    httpRequest.send();
+async function getUserStatusData(handle) {
+    return new Promise((resolve, reject) => {
+        let httpRequest = new XMLHttpRequest();
+        httpRequest.open('GET', 'https://codeforces.com/api/user.status?handle=' + handle, true);
+        httpRequest.send();
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState == 4) {
+                if (httpRequest.status == 200) {
+                    let res = processUserStatusData(JSON.parse(httpRequest.responseText));
+                    resolve(res);
+                } else {
+                    reject(new Error('Request failed with status ' + httpRequest.status));
+                }
+            }
+        };
+    });
+}
+
+function processUserStatusData(data) {
     let res = { rating: {}, tags: {}, lang: {}, unsolved: {} };
-    httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-            var json = JSON.parse(httpRequest.responseText);
-            var result = json.result;
-            var solved = {};
-            var key;
-            var contestId;
-            var problemIndex;
-            var problemId;
-            for (key in result) {
-                if (result[key].verdict === "OK") {
-                    contestId = result[key].problem.contestId;
-                    problemIndex = result[key].problem.index;
-                    problemId = contestId + problemIndex;
-                    if (problemId in solved) {
-                        continue;
-                    } else {
-                        solved[problemId] = { contestId: contestId, problemIndex: problemIndex };
-                    }
-                    var rating = result[key].problem.rating;
-                    var tags = result[key].problem.tags;
-                    var lang = result[key].programmingLanguage;
-                    if (rating in res.rating) {
-                        res.rating[rating]++;
-                    }
-                    else {
-                        res.rating[rating] = 1;
-                    }
-                    for (var key2 in tags) {
-                        var tag = tags[key2];
-                        if (tag in res.tags) {
-                            res.tags[tag]++;
-                        }
-                        else {
-                            res.tags[tag] = 1;
-                        }
-                    }
-                    if (lang in res.lang) {
-                        res.lang[lang]++;
-                    } else {
-                        res.lang[lang] = 1;
-                    }
+    let solved = {};
+    let result = data.result;
+
+    for (let key in result) {
+        if (result[key].verdict === "OK") {
+            let contestId = result[key].problem.contestId;
+            let problemIndex = result[key].problem.index;
+            let problemId = contestId + problemIndex;
+
+            if (!(problemId in solved)) {
+                solved[problemId] = { contestId: contestId, problemIndex: problemIndex };
+
+                let rating = result[key].problem.rating;
+                let tags = result[key].problem.tags;
+                let lang = result[key].programmingLanguage;
+
+                res.rating[rating] = (res.rating[rating] || 0) + 1;
+
+                for (let tag of tags) {
+                    res.tags[tag] = (res.tags[tag] || 0) + 1;
                 }
+
+                res.lang[lang] = (res.lang[lang] || 0) + 1;
             }
-            for (key in result) {
-                if (result[key].verdict !== "OK") {
-                    contestId = result[key].problem.contestId;
-                    problemIndex = result[key].problem.index;
-                    problemId = contestId + problemIndex;
-                    if (problemId in solved) { }
-                    else {
-                        res.unsolved[problemId] = { contestId: contestId, problemIndex: problemIndex };
-                    }
-                }
-            }
-            drawChart(res);
         }
+    }
+    for (let key in result) {
+        if (result[key].verdict !== "OK") {
+            let contestId = result[key].problem.contestId;
+            let problemIndex = result[key].problem.index;
+            let problemId = contestId + problemIndex;
+
+            if (!(problemId in solved)) {
+                res.unsolved[problemId] = { contestId: contestId, problemIndex: problemIndex };
+            }
+        }
+    }
+    return res;
+}
+
+async function updateUserChart(handle) {
+    try {
+        const data = await getUserStatusData(handle);
+        drawChart(data);
+    } catch (error) {
+        console.error('Error fetching user status data:', error);
     }
 }
 
@@ -129,7 +133,7 @@ function getContestStat(data) {
     return ret;
 }
 
-async function drawContestChartWithData(handle) {
+async function updateContestChart(handle) {
     try {
         const data = await getContestData(handle);
         drawContestChart(data);
