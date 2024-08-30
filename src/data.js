@@ -129,15 +129,11 @@ function getContestStat(data) {
     return ret;
 }
 
-async function fetchContestData(handle) {
+async function drawContestChartWithData(handle) {
     try {
-        return await getContestData(handle);
+        const data = await getContestData(handle);
+        drawContestChart(data);
     } catch (error) {
         console.error('Error fetching contest data:', error);
     }
-}
-
-async function drawContestChartWithData(handle) {
-    const data = await fetchContestData(handle);
-    drawContestChart(data);
 }
