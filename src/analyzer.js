@@ -8,7 +8,7 @@
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @require      https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js
-// @require      https://raw.githubusercontent.com/gShahr/codeforces-analyzer/main/src/charts.js
+// @require      https://raw.githubusercontent.com/gShahr/codeforces-analyzer/main/src/chart.js
 // @require      https://raw.githubusercontent.com/gShahr/codeforces-analyzer/main/src/data.js
 // @license      MIT
 // @downloadURL  https://update.greasyfork.org/scripts/465176/CF%E8%A7%A3%E9%A2%98%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96.user.js
