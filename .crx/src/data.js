@@ -141,5 +141,3 @@ async function updateContestChart(handle) {
         console.error('Error fetching contest data:', error);
     }
 }
-
-export { updateContestChart, updateUserChart };

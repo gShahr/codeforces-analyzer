@@ -1,22 +1,22 @@
 {
-    "manifest_version": 3,
-    "name": "Codeforces Analyzer",
-    "version": "2.0",
-    "description": "The Codeforces Analyzer is designed to provide insights into your problem-solving patterns on Codeforces.",
-    "permissions": [
-      "activeTab"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["https://codeforces.com/profile/*"],
-        "js": ["src/analyzer.js"],
-        "run_at": "document_end"
-      }
-    ],
-    "web_accessible_resources": [
-      {
-        "resources": ["src/data.js", "src/chart.js"],
-        "matches": ["<all_urls>"]
-      }
-    ]
-  }
+  "manifest_version": 3,
+  "name": "Codeforces Analyzer",
+  "version": "2.0",
+  "description": "The Codeforces Analyzer is designed to provide insights into your problem-solving patterns on Codeforces.",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://codeforces.com/profile/*"],
+      "js": ["src/data.js", "src/chart.js", "src/analyzer.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/data.js", "src/chart.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,5 +1,3 @@
-import { updateContestChart, updateUserChart } from './chart.js';
-
 (function() {
   'use strict';
 
